@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Polygon Ocean</title>
+  <link
+  rel="stylesheet"
+  href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"
+/>
+   <style>
+     @import url('https://fonts.googleapis.com/css2?family=Sixtyfour+Convergence&display=swap');
+      html, body {
+        margin: 0; /* Elimina el margen predeterminado */
+        height: 100%; /* Asegúrate de que el cuerpo ocupe toda la altura */
+        font-family: 'Sixtyfour Convergence', sans-serif;
+      }
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            image-rendering: pixelated;
+            filter: contrast(1.2);
+        }
+
+        p {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%); /* Centrar el <p> */
+            z-index: 1; /* Asegurarse de que el <p> esté delante del canvas */
+            color: white; /* Cambiar el color del texto si es necesario */
+            font-size: 120px; /* Ajustar el tamaño de fuente si es necesario */
+            text-align: center; 
+        }
+    </style>
+   </style>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<p class="animate__animated animate__zoomInDown">NEW ERA for ART</p>
+<!-- partial -->
+  <script  src="./3.js"></script>
+  <script>
+    // Crear estilos CSS dinámicamente
+    const style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            background-color: black; /* Fondo negro */
+            opacity: 1;
+            transition: opacity 1s ease; /* Transición de opacidad */
+        }
+        .fade-out {
+            opacity: 0; /* Hace que el cuerpo sea completamente transparente */
+        }
+    `;
+    document.head.appendChild(style); // Agregar el estilo al head
+
+    // Función de redirección con fade-out
+    setTimeout(function() {
+        document.body.classList.add('fade-out'); // Agrega la clase fade-out
+        setTimeout(function() {
+            window.location.href = "./4.html"; // Cambia "3.html" por tu archivo HTML
+        }, 1000); // Espera 1 segundo para completar el fade-out
+    }, 9000); // Espera 6 segundos antes de iniciar el fade-out
+</script>
+</body>
+</html>

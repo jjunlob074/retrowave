@@ -1,0 +1,366 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@900&family=Yellowtail&display=swap');
+
+*,
+*::before,
+*::after {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+header {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 6;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    text-align: center;
+    font-family: Tahoma, sans-serif;
+}
+
+header h1,
+header p {
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    background-color: rgba(224, 1, 231, 0.4);
+    background-image: linear-gradient(#f3f3f3 20%, #E001E7, #520069);
+}
+
+header h1 {
+    margin-top: 5rem;
+    font-family: 'Montserrat', sans-serif;
+    white-space: nowrap;
+    font-size: 5rem;
+    line-height: 1.1;
+    background-image: linear-gradient(
+        #f3f3f3 33%, 
+        #f78604,
+        #e38d03);
+}
+
+header p {
+    font-family: 'Yellowtail', serif;
+    font-size: 3rem;
+    line-height: 1.2;
+    white-space: nowrap;
+    transform: translateY(-30%) skew(0deg,-13deg);
+    background-image: linear-gradient(#f3f3f3 20%, rgb(250, 5, 5));
+}
+
+header::after {
+    content: "click here!";
+    font-family: courier, monospace;
+    font-size: 1rem;
+    font-weight: 300;
+    -webkit-animation: opacity 2s infinite;
+            animation: opacity 2s infinite;
+}
+
+body {
+    background-color: #000;
+    color: #f3f3f3;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    
+    perspective: 8rem;
+}
+
+.skybars {
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    z-index: 0;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    align-items: center;
+    transform: rotateX(-40deg)  translateZ(0);
+}
+
+.sky {
+    height: 40vh;
+    background-image: linear-gradient(
+        black, 
+        rgba(4, 150, 255, 0.5) 70%,
+        rgba(75, 179, 253, 0.5) 90%,
+        rgba(93, 252, 2, 0.5));
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: flex-end;
+    overflow: hidden;
+}
+
+.sky-animate-thunder {
+    -webkit-animation: thunder 0.4s;
+            animation: thunder 0.4s;
+}
+
+.sun {
+    z-index: 2;
+    width: 20rem;
+    height: 20rem;
+    border-radius: 50%;
+    background-color: transparent;
+    overflow: hidden;
+    transform: translateY(40px);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+/* reset all hr */
+.skybar-hr,
+.sunbar-hr,
+.vertical-hr,
+.horizontal-hr,
+.mountain {
+    border: none;
+    margin: 0;
+}
+
+.skybar-hr {
+    height: 0.1rem;
+    width: 100%;
+    background-color: rgba(255,255,255,0.02);
+}
+
+.sunbar-hr {
+    height: 0.6rem;
+    background-color: #DC992E;
+    background-image: linear-gradient(to right, #DC992E, #E5B467, #F2542D);
+}
+
+.mountain-wrapper {
+    position: absolute;
+    left: 0; bottom: -1rem; right: 0;
+    text-align: center;
+    height: auto;
+    z-index: 3;
+    background-color: rgba(255, 255, 255, 0.2);
+}
+
+/* 5 <hr> mountains per row, 4 rows */
+.mountain-row {
+    position: absolute;
+    left: 0; bottom: 0; right: 0;
+    margin: 0;
+    padding: 0;
+    display: flex;
+}
+
+.mountain-row:nth-child(1) {
+    justify-content: center;
+}
+
+.mountain-row:nth-child(2) {
+    flex-direction: row-reverse;
+    justify-content: center;
+    transform: translateY(0.5rem);
+}
+
+.mountain-row:nth-child(3) {
+    flex-direction: row;
+    justify-content: space-around;
+    padding: 0 5rem;
+    z-index: -1;
+}
+
+.mountain-row:nth-child(4) {
+    flex-direction: row;
+    justify-content: center;
+    padding: 0 3rem;
+    z-index: -1;   
+}
+
+/* all hr mountains */
+.mountain {
+    border: 2rem solid transparent;
+    border-bottom: 2rem solid #0f070f;
+    display: inline-block;
+}
+
+/* 1st row, 2nd mountain */
+.mountain-row:nth-child(1) .mountain:nth-child(2) {
+    border-width: 3rem;
+}
+
+/* 2nd row, all */
+.mountain-row:nth-child(2) .mountain {
+    border-bottom: 2rem solid #0b0114;
+}
+
+/* 2nd row, 2nd mountain */
+.mountain-row:nth-child(2) .mountain:nth-child(2) {
+    border-width: 4rem;
+}
+
+/* 2nd row, 3rd mountain */
+.mountain-row:nth-child(2) .mountain:nth-child(3) {
+    border-width: 5rem;
+}
+
+/* 3nd row, 2nd muntain */
+.mountain-row:nth-child(2) .mountain:nth-child(2) {
+    border-width: 3.5rem;
+}
+
+/* all mountains, 3nd row */
+.mountain-row:nth-child(3) .mountain {
+    border-bottom: 3.3rem solid rgb(32, 7, 32);
+    border-width: 3.3rem;
+    transform: translateX(-1.72rem); 
+}
+
+/* 3rd row, 1st mountain */
+.mountain-row:nth-child(3) .mountain:nth-child(1) {
+    border-width: 2.5rem;
+    transform: translateX(1.72rem); 
+}
+
+/* 3rd row, 3rd */
+.mountain-row:nth-child(3) .mountain:nth-child(3) {
+    border-width: 4rem;
+    transform: translateX(-6rem); 
+}
+
+/* 3rd row, 4th */
+.mountain-row:nth-child(3) .mountain:nth-child(4) {
+    border-width: 5.5rem;
+    transform: translateX(0); 
+}
+
+/* 4th row, all */
+.mountain-row:nth-child(4) .mountain { 
+    border-width: 6rem;
+    transform: translateY(3.5rem);    
+}
+
+.ground {
+    z-index: 5;
+    background-image: linear-gradient(
+        black,
+        rgba(224, 1, 231, 0.2) 50%);
+    min-height: 60vh;
+    flex-grow: grow;
+    position: relative;
+
+    transform-origin: 200% 0%;
+    transform: rotateX(20deg) translateZ(0);
+    animation: ground-animation 4s infinite;
+}
+
+/* overlay */
+.ground::after { 
+    content: "";
+    position: absolute;
+    z-index: 3;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-image:
+        radial-gradient(circle at top,
+            rgb(0,0,0,1),
+            transparent 30%),
+        linear-gradient(rgba(0,0,0,0.7),
+            transparent 50%);
+}
+
+.horizontal-hr {
+    height: 1px;
+    background-image: linear-gradient(
+        to left,
+        transparent,
+        rgb(32, 231, 1),
+        transparent);
+    margin: 1rem 0;
+}
+
+/* div container inside ground */
+#vertical {
+    position: absolute;
+    left: 0; top: 0; right: 0; bottom: 0;
+    z-index: 3;
+    height: 100vw;
+    transform: rotate(90deg);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+    
+}
+
+.vertical-hr {
+    width: 100%;
+    height: 1px;
+    background-image: linear-gradient(
+        to right,
+        #6bf600,
+        transparent);
+}
+
+@-webkit-keyframes opacity {
+    0% {
+        opacity: 1;
+    } 50% {
+        opacity: 0;
+    } 100% {
+        opacity: 1;
+    }
+}
+
+@keyframes opacity {
+    0% {
+        opacity: 1;
+    } 50% {
+        opacity: 0;
+    } 100% {
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes thunder {
+    0% {
+        background-color: transparent;
+    } 25% {
+        background-color: rgba(255,255,255,0.4);
+    } 50% {
+        background-color: transparent;
+    } 75% {
+        background-color: rgba(255,255,255,0.4);
+    } 100% {
+        background-color: transparent;
+    }
+}
+
+@keyframes thunder {
+    0% {
+        background-color: transparent;
+    } 25% {
+        background-color: rgba(255,255,255,0.4);
+    } 50% {
+        background-color: transparent;
+    } 75% {
+        background-color: rgba(255,255,255,0.4);
+    } 100% {
+        background-color: transparent;
+    }
+}
+@keyframes ground-animation {
+    0% {
+        background-color: rgba(224, 1, 231, 0.1);
+    }
+    50% {
+        background-color: rgba(224, 1, 231, 0.3);
+    }
+    100% {
+        background-color: rgba(224, 1, 231, 0.1);
+    }
+}
+
+@media screen and (max-height: 359px) {
+    header h1 {
+        margin-top: 0;
+    }   
+}
+

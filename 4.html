@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - Animation At Work — Retrowave, babyyyy!</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+<style>
+  html {
+  --bg: midnightblue;
+  --bg-alt: darkslateblue;
+  --sun-start: gold;
+  --sun-end: deeppink;
+  height: 100%;
+  background: linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), linear-gradient(-45deg, var(--bg), var(--bg-alt));
+}
+
+body {
+  display: grid;
+  min-height: 100%;
+  place-content: center;
+}
+
+svg {
+  display: block;
+  width: min(80vmin, 24rem);
+  height: auto;
+}
+
+[data-woosh=small] {
+  filter: brightness(800%);
+}
+</style>
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+  <defs>
+    <rect id="grad-box" x="0" y="0" width="100" height="100"></rect>
+    <clipPath id="sun-clip">
+      <circle id="sun" r="48" cx="50" cy="50" fill="url(#sun-grad)" mask="url(#sun-mask)" data-sun="data-sun"></circle>
+    </clipPath>
+    <clipPath id="letter-clip">
+      <path id="letter" d="m50,45.102l11.077,22.807h-22.155l11.077-22.807m0-32.044L16.559,81.909h66.883L50,13.058h0Z"></path>
+    </clipPath>
+    <linearGradient id="sun-grad" x1="0" x2="0" y1="0" y2="100%" gradientUnits="objectBoundingBox">
+      <stop offset="0%" stop-color="var(--sun-start)"></stop>
+      <stop offset="100%" stop-color="var(--sun-end)"></stop>
+    </linearGradient>
+    <linearGradient id="letter-fill-top" x1="0" y1="0" x2="0" y2="100%" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="hsl(220, 100%, 11%)"></stop>
+      <stop offset=".250" stop-color="hsl(217, 83%, 40%)"></stop>
+      <stop offset=".45" stop-color="hsl(265, 98%, 67%)"></stop>
+      <stop offset=".65" stop-color="hsl(28, 99%, 92%)"></stop>
+    </linearGradient>
+    <linearGradient id="letter-fill-bottom" x1="0" y1="0" x2="0" y2="100%" gradientUnits="objectBoundingBox">
+      <stop offset=".62" stop-color="hsl(263, 100%, 18%)" stop-opacity="0"></stop>
+      <stop offset=".621" stop-color="hsl(263, 100%, 18%)"></stop>
+      <stop offset="1" stop-color="hsl(258, 100%, 66%)"></stop>
+    </linearGradient>
+    <linearGradient id="letter-stroke" x1="23.816" y1="38.072" x2="76.184" y2="90.44" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#cf72a3"></stop>
+      <stop offset=".231" stop-color="#2d1c50"></stop>
+      <stop offset=".625" stop-color="#fdeef4"></stop>
+      <stop offset="1" stop-color="#4d6ab2"></stop>
+    </linearGradient>
+    <linearGradient id="grad-power" x1="0" y1="0" x2="0" y2="100%" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="deeppink"></stop>
+      <stop offset="1" stop-color="deeppink" stop-opacity="0"></stop>
+    </linearGradient>
+    <linearGradient id="grad-shine" x1="0" y1="25%" x2="100%" y2="0" gradientUnits="objectBoundingBox">
+      <stop offset="0.33" stop-color="white" stop-opacity="0"></stop>
+      <stop offset="0.45" stop-color="white" stop-opacity="1"></stop>
+      <stop offset="0.55" stop-color="white" stop-opacity="1"></stop>
+      <stop offset="0.67" stop-color="white" stop-opacity="0"></stop>
+    </linearGradient>
+    <mask id="sun-mask">
+      <rect x="2.1811868728542265" y="54.166666666666664" width="95.63762625429155" height="4.166666666666667" fill="white" data-sun-line="data-sun-line"></rect>
+      <rect x="3.656176247530027" y="62.5" width="92.68764750493995" height="4.166666666666667" fill="white" data-sun-line="data-sun-line"></rect>
+      <rect x="6.756824558987084" y="70.83333333333333" width="86.48635088202583" height="4.166666666666667" fill="white" data-sun-line="data-sun-line"></rect>
+      <rect x="11.877755108656622" y="79.16666666666666" width="76.24448978268676" height="4.166666666666667" fill="white" data-sun-line="data-sun-line"></rect>
+      <rect x="20.037523466842732" y="87.5" width="59.924953066314536" height="4.166666666666667" fill="white" data-sun-line="data-sun-line"></rect>
+      <rect x="35.741474285342306" y="95.83333333333334" width="28.51705142931539" height="4.166666666666667" fill="white" data-sun-line="data-sun-line"></rect>
+      <rect x="0" y="0" width="100" height="50.01" fill="white" data-sun-top="data-sun-top"></rect>
+      <rect x="0" y="100" width="100" height="100" fill="black" data-sun-bottom="data-sun-bottom"></rect>
+    </mask>
+    <mask id="anti-mask">
+      <rect x="0" y="0" width="100" height="100" fill="white"></rect>
+      <rect x="0" y="4.166666666666667" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="12.5" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="20.833333333333336" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="29.166666666666668" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="37.5" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="45.833333333333336" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="54.166666666666664" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="62.5" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="70.83333333333334" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="79.16666666666667" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="87.50000000000001" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+      <rect x="0" y="95.83333333333334" width="100" height="9.166666666666668" fill="black" data-anti-line="data-anti-line"></rect>
+    </mask>
+    <filter id="blur">
+      <feGaussianBlur in="SourceGraphic" stdDeviation="2"></feGaussianBlur>
+    </filter>
+    <filter id="glow" height="300%" width="300%" x="-75%" y="-75%">
+      <feMorphology operator="dilate" radius="2" in="SourceAlpha" result="glow-thicken"></feMorphology>
+      <feGaussianBlur in="glow-thicken" stdDeviation="2" result="glow-blurred"></feGaussianBlur>
+      <feFlood flood-color="deeppink" result="glow-expand"></feFlood>
+      <feComposite in="glow-expand" in2="glow-blurred" operator="in" result="glow-color"></feComposite>
+      <feComponentTransfer>
+        <feFuncA type="linear" slope="0.25"></feFuncA>
+      </feComponentTransfer>
+    </filter>
+    <filter id="displace">
+      <feTurbulence type="fractalNoise" baseFrequency="0.05 0.0125" numOctaves="4" result="displaceTurbulence" seed="3"></feTurbulence>
+      <feDisplacementMap in2="displaceTurbulence" in="SourceGraphic" xChannelSelector="R" yChannelSelector="B" scale="16" result="displaceMap"></feDisplacementMap>
+      <feGaussianBlur in="displaceMap" stdDeviation="0.25" result="displaceBlur"></feGaussianBlur>
+      <feColorMatrix in="displaceBlur" type="matrix" values="
+				1 0 0 0  0
+				0 1 0 0  0
+				0 0 1 0  0
+				0 0 0 8 -7" result="displaceSharp"></feColorMatrix>
+    </filter>
+  </defs>
+  <use href="#sun"></use>
+  <rect x="17.5" y="80" width="65" height="10" fill="url(#grad-power)" data-woosh="big"></rect>
+  <rect x="48" y="80" width="4" height="20" fill="url(#grad-power)" data-woosh="small"></rect>
+  <g mask="url(#anti-mask)" clip-path="url(#sun-clip)">
+    <use href="#grad-box" fill="url(#grad-shine)" data-shine="data-shine" opacity="0.75"></use>
+    <g transform="translate(0 0)" data-letter="data-letter">
+      <use href="#letter" filter="url(#glow)" data-glow="data-glow"></use>
+      <g clip-path="url(#letter-clip)">
+        <use href="#letter" fill="url(#letter-fill-top)"></use>
+        <use href="#grad-box" fill="url(#letter-fill-bottom)" filter="url(#displace)"></use>
+        <use href="#letter" fill="none" stroke="black" stroke-width="0.5" filter="url(#blur)"></use>
+        <use href="#grad-box" fill="url(#grad-shine)" data-shine="data-shine"></use>
+      </g>
+      <use href="#letter" fill="none" stroke="url(#letter-stroke)"></use>
+    </g>
+  </g>
+</svg>
+<!-- partial -->
+  <script src='https://unpkg.co/gsap@3/dist/gsap.min.js'></script>
+  <script  src="./4.js"></script>
+  <script>
+    // Crear estilos CSS dinámicamente
+    const style = document.createElement('style');
+    style.innerHTML = `
+        body {
+            opacity: 1;
+            transition: opacity 1s ease; /* Transición de opacidad */
+        }
+        .fade-out {
+            opacity: 0; /* Hace que el cuerpo sea completamente transparente */
+            pointer-events: none; /* Evita interacciones durante el fade-out */
+        }
+    `;
+    document.head.appendChild(style); // Agregar el estilo al head
+
+    // Función de redirección con fade-out
+    setTimeout(function() {
+        document.body.classList.add('fade-out'); // Agrega la clase fade-out
+        setTimeout(function() {
+            window.location.href = "./5.html"; // Cambia "5.html" por tu archivo HTML
+        }, 1000); // Espera 1 segundo para completar el fade-out
+    }, 4000); // Espera 3 segundos antes de iniciar el fade-out
+</script>
+
+</body>
+</html>

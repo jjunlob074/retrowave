@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>New Retrowave</title>
+  <link rel="stylesheet" href="styles.css">
+  <style>
+	body {
+		background-color: #000;
+		font-family: 'Courier New', Courier, monospace;
+	}
+	  .playButton {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        padding: 10px 20px;
+        background-color: #FEAA00;
+        color: #21008D;
+        border: 2px solid #6af31b;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 16px;
+		font-weight: bold;
+		z-index: 100;
+		transition: background-color 0.5s ease, color 0.5s ease,  border-color 0.5s ease;
+      }
+	  .b2 {
+        left: 180px;
+		text-decoration: none;
+		font-weight: bold;
+	  }
+      .playButton:hover {
+        background-color: #ba23a6;
+		color:#6af31b;
+		border-color: #EC8D09;
+      }
+	
+	/* CSS para centrar la imagen y aplicar el efecto */
+	#retrowaveImage {
+		aspect-ratio: 16 / 9;
+		position: absolute;
+		top: 30%; /* Posiciona la imagen al 30% desde la parte superior */
+		left: 50%; /* Centra horizontalmente */
+		transform: translateX(-50%) scale(0); /* Solo ajusta el desplazamiento horizontal para centrar */
+		animation: fadeInScale 4s forwards, pulse 2s infinite 4s; /* Añade la animación de fade-in, escala y pulso con delay */
+		z-index: 1; /* Asegura que la imagen esté por encima de otros elementos */
+	}
+
+	/* Definición de la animación de fade-in y escalado */
+	@keyframes fadeInScale {
+		0% {
+			opacity: 0; /* Comienza completamente transparente */
+			transform: translate(-50%, -50%) scale(0); /* Comienza pequeña */
+		}
+		50% {
+			opacity: 1; /* Se hace visible */
+			transform: translate(-50%, -50%) scale(1.5); /* Aumenta de tamaño */
+		}
+		100% {
+			opacity: 1; /* Se mantiene visible */
+			transform: translate(-50%, -50%) scale(1); /* Vuelve a su tamaño original */
+		}
+	}
+
+	/* Efecto de pulso con drop shadow */
+	@keyframes pulse {
+		0%, 100% {
+			transform: translate(-50%, -50%) scale(1); /* Mantiene el tamaño original */
+			filter: drop-shadow(0 0 0 rgba(0, 255, 0, 0)); /* Sin sombra al inicio y al final */
+		}
+		50% {
+			transform: translate(-50%, -50%) scale(1.05); /* Aumenta ligeramente de tamaño */
+			filter: drop-shadow(0 0 20px rgba(0, 255, 0, 0.8)); /* Sombra verde neón en el contorno */
+		}
+	}
+
+
+  </style>
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!-- LICENSE: CC BY-NC-SA (https://creativecommons.org/licenses/by-nc-sa/4.0/) -->
+<script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+<script>
+
+	AFRAME.registerComponent( 'max-anisotropy', {
+		dependencies: [ 'material', 'geometry' ],
+		init: function() {
+			var el = this.el;
+			var material = el.getObject3D( 'mesh' ).material;
+			material.map.anisotropy = el.sceneEl.renderer.capabilities.getMaxAnisotropy();
+			material.map.needsUpdate = true;
+			/*
+			// Use if loading an external image...
+			el.addEventListener( 'materialtextureloaded', () => {
+				material.map.anisotropy = el.sceneEl.renderer.capabilities.getMaxAnisotropy();
+				material.map.needsUpdate = true;
+			} );
+			*/
+		}
+	} );
+
+	AFRAME.registerComponent( 'canvas-updater', {
+		dependencies: [ 'material', 'geometry' ],
+		tick: function() {
+			var el = this.el;
+			var material = el.getObject3D( 'mesh' ).material;
+			if( material.map ) material.map.needsUpdate = true;
+			if( material.displacementMap ) material.displacementMap.needsUpdate = true;
+		}
+	} );
+	
+	AFRAME.registerComponent( 'position-loop', {
+		schema: {
+			duration: { type: 'int', default: 1000 },
+			progress: { type: 'int', default: 0 },
+			from: { type: 'vec3', default: { x: 0, y: 0, z: 0 } },
+			to: { type: 'vec3', default: { x: 0, y: 0, z: 0 } }
+		},
+		tick: function( time, delta ) {
+
+			var a_duration = this.data.duration;
+			var a_progress = this.data.progress + delta;
+			if( a_progress > a_duration ) a_progress -= a_duration;
+			var a_playhead = a_progress / a_duration; /* 0 to 1 */
+
+			var from_x = this.data.from.x;
+			var from_y = this.data.from.y;
+			var from_z = this.data.from.z;
+
+			var to_x = this.data.to.x;
+			var to_y = this.data.to.y;
+			var to_z = this.data.to.z;
+
+			var progress_x = ( to_x - from_x ) * a_playhead;
+			var progress_y = ( to_y - from_y ) * a_playhead;
+			var progress_z = ( to_z - from_z ) * a_playhead;
+
+			this.el.setAttribute( 'position', {
+				x: from_x + progress_x,
+				y: from_y + progress_y,
+				z: from_z + progress_z
+			} );
+			this.el.setAttribute( 'position-loop', 'progress', a_progress );
+
+		}
+	} );
+	
+	AFRAME.registerComponent( 'vaporwave-tree', {
+		schema: {
+			trunkSegments: { type: 'int', default: 5 },
+			trunkBend: { type: 'number', default: 0 },
+			trunkColor: { type: 'color', default: '#00FFFF' },
+			leafDensity: { type: 'int', default: 16 },
+			leafColor: { type: 'color', default: '#00FFFF' },
+			wireframe: { type: 'boolean', default: true }
+		},
+		init: function() {
+
+			// Trunk height clamp...
+			var trunkSegments = parseInt( this.data.trunkSegments );
+			if( trunkSegments < 1 ) trunkSegments = 1;
+			if( trunkSegments > 8 ) trunkSegments = 8;
+
+			// Build trunk...
+			var ParentTrunkEl = this.el;
+			for( var _i = 0; _i <= trunkSegments - 1; _i ++ ) {
+
+				// Trunk Primitive...
+				var TrunkPrimitive = document.createElement( 'a-cone' );
+				TrunkPrimitive.setAttribute( 'height', '1' );
+				TrunkPrimitive.setAttribute( 'segments-height', '1' );
+				TrunkPrimitive.setAttribute( 'segments-radial', '6' );
+				TrunkPrimitive.setAttribute( 'radius-bottom', '0.2' );
+				TrunkPrimitive.setAttribute( 'radius-top', '0.25' );
+				TrunkPrimitive.setAttribute( 'position', '0 0.5 0' );
+				TrunkPrimitive.setAttribute( 'scale', '' + ( 1 - ( 0.1 * _i ) ) + ' 1 ' + ( 1 - ( 0.1 * _i ) ) );
+				if( this.data.wireframe ) {
+					TrunkPrimitive.setAttribute( 'material', 'shader: flat; wireframe: true; color: ' + this.data.trunkColor + ';' );
+				} else {
+					TrunkPrimitive.setAttribute( 'material', 'flatShading: true; color: ' + this.data.trunkColor + ';' );
+				}
+
+				// Trunk Wrapper...
+				var TrunkRig = document.createElement( 'a-entity' );
+				TrunkRig.setAttribute( 'position', '0 ' + ( _i ? '1' : '0' ) + ' 0' );
+				TrunkRig.setAttribute( 'rotation', '0 0 ' + ( _i ? this.data.trunkBend : '0' ) );
+				TrunkRig.appendChild( TrunkPrimitive );
+
+				// Parent Append...
+				ParentTrunkEl.appendChild( TrunkRig );
+
+				// Become Parent...
+				ParentTrunkEl = TrunkRig;
+
+			}
+
+			// Canopy density clamp...
+			var leafDensity = parseInt( this.data.leafDensity );
+			if( leafDensity < 1 ) leafDensity = 1;
+			if( leafDensity > 32 ) leafDensity = 32;
+
+			// Canopy rig...
+			var CanopyRig = document.createElement( 'a-entity' );
+			CanopyRig.setAttribute( 'position', '0 1 0' );
+			CanopyRig.setAttribute( 'rotation', '0 0 ' + ( _i ? this.data.trunkBend : '0' ) );
+			ParentTrunkEl.appendChild( CanopyRig );
+
+			// Build canopy...
+			for( var _i = 0; _i < leafDensity; _i ++ ) {
+
+				// Leaf tip outer...
+				var LeafTipOuter = document.createElement( 'a-cone' );
+				LeafTipOuter.setAttribute( 'height', '0.75' );
+				LeafTipOuter.setAttribute( 'segments-height', '1' );
+				LeafTipOuter.setAttribute( 'segments-radial', '4' );
+				LeafTipOuter.setAttribute( 'radius-bottom', '0.25' );
+				LeafTipOuter.setAttribute( 'radius-top', '0' );
+				LeafTipOuter.setAttribute( 'position', '0 0.375 0' );
+				LeafTipOuter.setAttribute( 'scale', '0.1 1 1' );
+				if( this.data.wireframe ) {
+					LeafTipOuter.setAttribute( 'material', 'shader: flat; wireframe: true; color: ' + this.data.leafColor + ';' );
+				} else {
+					LeafTipOuter.setAttribute( 'material', 'flatShading: true; color: ' + this.data.leafColor + ';' );
+				}
+				var LeafTipOuterRig = document.createElement( 'a-entity' );
+				LeafTipOuterRig.setAttribute( 'position', '0 0.5 0' );
+				LeafTipOuterRig.setAttribute( 'rotation', '0 0 22.5' );
+				LeafTipOuterRig.appendChild( LeafTipOuter );
+
+				// Leaf tip inner...
+				var LeafTipInner = document.createElement( 'a-cylinder' );
+				LeafTipInner.setAttribute( 'height', '0.5' );
+				LeafTipInner.setAttribute( 'segments-height', '1' );
+				LeafTipInner.setAttribute( 'segments-radial', '4' );
+				LeafTipInner.setAttribute( 'radius', '0.25' );
+				LeafTipInner.setAttribute( 'position', '0 0.25 0' );
+				LeafTipInner.setAttribute( 'scale', '0.1 1 1' );
+				if( this.data.wireframe ) {
+					LeafTipInner.setAttribute( 'material', 'shader: flat; wireframe: true; color: ' + this.data.leafColor + ';' );
+				} else {
+					LeafTipInner.setAttribute( 'material', 'flatShading: true; color: ' + this.data.leafColor + ';' );
+				}
+				var LeafTipInnerRig = document.createElement( 'a-entity' );
+				LeafTipInnerRig.setAttribute( 'position', '0 0.5 0' );
+				LeafTipInnerRig.setAttribute( 'rotation', '0 0 22.5' );
+				LeafTipInnerRig.appendChild( LeafTipInner );
+				LeafTipInnerRig.appendChild( LeafTipOuterRig );
+
+				// Leaf base inner...
+				var LeafBaseInner = document.createElement( 'a-cylinder' );
+				LeafBaseInner.setAttribute( 'height', '0.5' );
+				LeafBaseInner.setAttribute( 'segments-height', '1' );
+				LeafBaseInner.setAttribute( 'segments-radial', '4' );
+				LeafBaseInner.setAttribute( 'radius', '0.25' );
+				LeafBaseInner.setAttribute( 'position', '0 0.25 0' );
+				LeafBaseInner.setAttribute( 'scale', '0.1 1 1' );
+				if( this.data.wireframe ) {
+					LeafBaseInner.setAttribute( 'material', 'shader: flat; wireframe: true; color: ' + this.data.leafColor + ';' );
+				} else {
+					LeafBaseInner.setAttribute( 'material', 'flatShading: true; color: ' + this.data.leafColor + ';' );
+				}
+				var LeafBaseInnerRig = document.createElement( 'a-entity' );
+				LeafBaseInnerRig.setAttribute( 'position', '0 0.75 0' );
+				LeafBaseInnerRig.setAttribute( 'rotation', '0 0 22.5' );
+				LeafBaseInnerRig.appendChild( LeafBaseInner );
+				LeafBaseInnerRig.appendChild( LeafTipInnerRig );
+
+				// Leaf base outer...
+				var LeafBaseOuter = document.createElement( 'a-cone' );
+				LeafBaseOuter.setAttribute( 'height', '0.75' );
+				LeafBaseOuter.setAttribute( 'segments-height', '1' );
+				LeafBaseOuter.setAttribute( 'segments-radial', '4' );
+				LeafBaseOuter.setAttribute( 'radius-bottom', '0' );
+				LeafBaseOuter.setAttribute( 'radius-top', '0.25' );
+				LeafBaseOuter.setAttribute( 'position', '0 0.375 0' );
+				LeafBaseOuter.setAttribute( 'scale', '0.1 1 1' );
+				if( this.data.wireframe ) {
+					LeafBaseOuter.setAttribute( 'material', 'shader: flat; wireframe: true; color: ' + this.data.leafColor + ';' );
+				} else {
+					LeafBaseOuter.setAttribute( 'material', 'flatShading: true; color: ' + this.data.leafColor + ';' );
+				}
+				var LeafBaseOuterRig = document.createElement( 'a-entity' );
+				LeafBaseOuterRig.setAttribute( 'rotation', [ 0, Math.random() * 360 , ( Math.random() * 90 ) + 30 ].join( ' ' ) );
+				LeafBaseOuterRig.setAttribute( 'scale', Array( 3 ).fill( ( Math.random() * 0.25 ) + 0.75 ).join( ' ' ) );
+				LeafBaseOuterRig.appendChild( LeafBaseOuter );
+				LeafBaseOuterRig.appendChild( LeafBaseInnerRig );
+				
+				// Attach to canopy...
+				CanopyRig.appendChild( LeafBaseOuterRig );
+
+			}
+
+		}
+
+	} );
+
+</script>
+<button class="playButton" id="playMusic">Menu Music</button>
+<a class="playButton b2" href="./2.html">Learn Retrowave</a>
+<audio id="audio" src="audio.mp3" loop></audio>
+<img id="retrowaveImage" src="retrowave.png" alt="Retrowave" />
+
+<a-scene fog="type: linear; color: #404; far: 384;" renderer="antialias: true; logarithmicDepthBuffer: true;" light="defaultLightsEnabled: false;">
+    
+	<a-assets>
+		<canvas id="SunCanvas" width="512" height="512" crossorigin="anonymous"></canvas>
+		<canvas id="SkyCanvas" width="6400" height="3200" crossorigin="anonymous"></canvas>
+		<canvas id="GridCanvas" width="2048" height="2048" crossorigin="anonymous"></canvas>
+		<canvas id="HillsCanvas" width="32" height="32" crossorigin="anonymous"></canvas>
+	</a-assets>
+
+	<a-entity id="CameraRig" position="0 192 -640" rotation="16 0 0">
+		<a-entity material="shader: flat; color: #FFFFFF; src: #SkyCanvas; fog: false; side: back;" geometry="primitive: sphere; radius: 800;" position="0 0 640" rotation="0 90 0" canvas-updater></a-entity>
+		<a-entity material="shader: flat; color: #FFFFFF; src: #SunCanvas; fog: false;" geometry="primitive: cylinder; radius: 128; height: 1; segmentsRadial: 64;" rotation="0 90 90" canvas-updater max-anisotropy></a-entity>
+		<a-entity camera="fov: 60; far: 1023.9;" position="0 0 640"></a-entity>
+	</a-entity>
+
+	<a-entity position="0 192 -640" light="type: point; color: #FA0; intensity: 2; distance: 640;"></a-entity>
+	<a-entity light="type: hemisphere; color: #FFF; groundColor: #A0F; intensity: 2;"></a-entity>
+	<a-sky radius="1024" material="color: #404; fog: false;"></a-sky>
+
+	<a-entity position="0 0 0" position-loop="duration: 6400; progress: 0; from: 0 0 0; to: 0 0 256;">
+		<a-plane width="256" height="256" segments-width="32" segments-height="32" position="0 0 -128" rotation="-90 0 0" material="src: #GridCanvas; flatShading: true; displacementMap: #HillsCanvas; displacementScale: 64;" canvas-updater max-anisotropy></a-plane>
+		<a-plane width="256" height="256" segments-width="32" segments-height="32" position="0 0 -384" rotation="-90 0 0" material="src: #GridCanvas; flatShading: true; displacementMap: #HillsCanvas; displacementScale: 64;" canvas-updater max-anisotropy></a-plane>
+		<a-plane width="256" height="256" segments-width="32" segments-height="32" position="0 0 -640" rotation="-90 0 0" material="src: #GridCanvas; flatShading: true; displacementMap: #HillsCanvas; displacementScale: 64;" canvas-updater max-anisotropy></a-plane>
+		<a-plane width="256" height="256" segments-width="32" segments-height="32" position="0 0 -896" rotation="-90 0 0" material="src: #GridCanvas; flatShading: true; displacementMap: #HillsCanvas; displacementScale: 64;" canvas-updater max-anisotropy></a-plane>
+	</a-entity>
+
+	<a-entity position="0 0 0" scale="5 5 5" position-loop="duration: 16800; progress: 16000; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -32" scale="5 5 5" position-loop="duration: 16800; progress: 15200; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -64" scale="5 5 5" position-loop="duration: 16800; progress: 14400; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -96" scale="5 5 5" position-loop="duration: 16800; progress: 13600; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -128" scale="5 5 5" position-loop="duration: 16800; progress: 12800; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -160" scale="5 5 5" position-loop="duration: 16800; progress: 12000; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -192" scale="5 5 5" position-loop="duration: 16800; progress: 11200; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -224" scale="5 5 5" position-loop="duration: 16800; progress: 10400; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -256" scale="5 5 5" position-loop="duration: 16800; progress: 9600; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -288" scale="5 5 5" position-loop="duration: 16800; progress: 8800; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -320" scale="5 5 5" position-loop="duration: 16800; progress: 8000; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -352" scale="5 5 5" position-loop="duration: 16800; progress: 7200; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -384" scale="5 5 5" position-loop="duration: 16800; progress: 6400; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -416" scale="5 5 5" position-loop="duration: 16800; progress: 5600; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -448" scale="5 5 5" position-loop="duration: 16800; progress: 4800; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -480" scale="5 5 5" position-loop="duration: 16800; progress: 4000; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -512" scale="5 5 5" position-loop="duration: 16800; progress: 3200; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -544" scale="5 5 5" position-loop="duration: 16800; progress: 2400; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -576" scale="5 5 5" position-loop="duration: 16800; progress: 1600; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -608" scale="5 5 5" position-loop="duration: 16800; progress: 800; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+	<a-entity position="0 0 -640" scale="5 5 5" position-loop="duration: 16800; progress: 0; from: 0 0 -640; to: 0 0 32;">
+		<a-entity position="-6.4 0 0" vaporwave-tree="trunkBend: -3;"></a-entity>
+		<a-entity position="6.4 0 0" vaporwave-tree="trunkBend: 3;"></a-entity>
+	</a-entity>
+        <!-- Nueva estructura del Delorean -->
+		<a-entity class="demo delorean demo">
+			<a-entity class="mirror-left"></a-entity>
+			<a-entity class="mirror-right"></a-entity>
+			<a-entity class="delorean-cases">
+			  <a-entity class="wheel-case-left"></a-entity>
+			  <a-entity class="wheel-case-right"></a-entity>
+			  <a-entity class="wheel-left"></a-entity>
+			  <a-entity class="wheel-right"></a-entity>
+			</a-entity>
+			<a-entity class="delorean-top">
+			  <a-entity class="top-lines-on-top"></a-entity>
+			  <a-entity class="top-lines-on-top right"></a-entity>
+			  <a-entity class="rear-window"></a-entity>
+			  <a-entity class="lights">
+				<a-entity class="lights-frame"></a-entity>
+				<a-entity class="red-light-left"></a-entity>
+				<a-entity class="red-light-right"></a-entity>
+				<a-entity class="id-container">
+				  <a-entity class="id"></a-entity>
+				</a-entity>
+			  </a-entity>
+			  <a-entity class="bumper-light-reflection"></a-entity>
+			  <a-entity class="bumper-light-reflection right"></a-entity>
+			</a-entity>
+			<a-entity class="bumper">
+			  <a-entity class="bumper-reflection"></a-entity>
+			  <a-entity class="bumper-logo"></a-entity>
+			  <a-entity class="bumper-hole-1"></a-entity>
+			  <a-entity class="bumper-hole-2"></a-entity>
+			  <a-entity class="bumper-sticker"></a-entity>
+			  <a-entity class="dashes"></a-entity>
+			</a-entity>
+			<a-entity class="shadow"></a-entity>
+		  </a-entity>
+		  <!-- Fin de la nueva estructura del Delorean -->
+	  
+</a-scene>
+<!-- partial -->
+  <script  src="./scriptIndex.js"></script>
+  <script>
+	const playButton = document.getElementById('playMusic');
+	const audio = document.getElementById('audio');
+    
+	// Verificar si la música estaba reproduciéndose
+    if (localStorage.getItem('isPlaying') === 'true') {
+      audio.currentTime = localStorage.getItem('currentTime') || 0;
+      audio.play();
+    }
+
+	playButton.addEventListener('click', () => {
+	  audio.play();
+	  localStorage.setItem('isPlaying', 'true');
+	});
+
+	    // Guardar el tiempo de la música al cerrar o cambiar de página
+		window.addEventListener('beforeunload', () => {
+      localStorage.setItem('currentTime', audio.currentTime);
+    });
+  </script>
+</body>
+</html>
